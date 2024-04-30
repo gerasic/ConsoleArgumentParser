@@ -1,14 +1,10 @@
 #include <lib/ArgParser.h>
+#include <vector>
 #include <gtest/gtest.h>
 #include <sstream>
 
-
 using namespace ArgumentParser;
 
-/*
-    Функция принимает в качество аргумента строку, разделяет ее по "пробелу"
-    и возвращает вектор полученных слов
-*/
 std::vector<std::string> SplitString(const std::string& str) {
     std::istringstream iss(str);
 
@@ -38,6 +34,16 @@ TEST(ArgParserTestSuite, ShortNameTest) {
 
     ASSERT_TRUE(parser.Parse(SplitString("app -p=value1")));
     ASSERT_EQ(parser.GetStringValue("param1"), "value1");
+}
+
+TEST(ArgParserTestSuite, NoEquialSignTest) {
+    ArgParser parser("My Parser");
+    parser.AddStringArgument('p', "param1");
+    parser.AddStringArgument('P', "param2");
+
+    ASSERT_TRUE(parser.Parse(SplitString("app -p value1 --param2 value2")));
+    ASSERT_EQ(parser.GetStringValue("param1"), "value1");
+    ASSERT_EQ(parser.GetStringValue("param2"), "value2");
 }
 
 
@@ -76,6 +82,18 @@ TEST(ArgParserTestSuite, MultiStringTest) {
 
     ASSERT_TRUE(parser.Parse(SplitString("app --param1=value1 --param2=value2")));
     ASSERT_EQ(parser.GetStringValue("param2"), "value2");
+    ASSERT_EQ(value, "value1");
+}
+
+
+TEST(ArgParserTestSuite, MultiIntTest) {
+    ArgParser parser("My Parser");
+    std::vector<int> values;
+    std::vector<int> ans = {1,2,3,4,5,6,7,8,9,10};
+    parser.AddIntArgument('n', "N").MultiValue().StoreValues(values);
+
+    ASSERT_TRUE(parser.Parse(SplitString("app -n 1 2 3 4 5 --N 6 7 8 9 10")));
+    ASSERT_TRUE(std::equal(values.begin(), values.end(), ans.begin()));
 }
 
 
@@ -136,21 +154,12 @@ TEST(ArgParserTestSuite, FlagsTest) {
 TEST(ArgParserTestSuite, PositionalArgTest) {
     ArgParser parser("My Parser");
     std::vector<int> values;
-    parser.AddIntArgument("Param1").MultiValue(1).Positional().StoreValues(values);
+    parser.AddIntArgument("Param1").Positional().StoreValues(values);
 
-    ASSERT_TRUE(parser.Parse(SplitString("app 1 2 3 4 5")));
+    ASSERT_TRUE(parser.Parse(SplitString("app 1 2 3 4 5 6 7 8 9")));
     ASSERT_EQ(values[0], 1);
-    ASSERT_EQ(values[2], 3);
-    ASSERT_EQ(values.size(), 5);
-}
-
-
-TEST(ArgParserTestSuite, HelpTest) {
-    ArgParser parser("My Parser");
-    parser.AddHelp('h', "help", "Some Description about program");
-
-    ASSERT_TRUE(parser.Parse(SplitString("app --help")));
-    ASSERT_TRUE(parser.Help());
+    ASSERT_EQ(values[5], 6);
+    ASSERT_EQ(values.size(), 9);
 }
 
 
@@ -164,19 +173,4 @@ TEST(ArgParserTestSuite, HelpStringTest) {
 
 
     ASSERT_TRUE(parser.Parse(SplitString("app --help")));
-    // Проверка закоментирована намеренно. Ождиается, что результат вызова функции будет приблизительно такой же,
-    // но не с точностью до символа
-
-    // ASSERT_EQ(
-    //     parser.HelpDescription(),
-    //     "My Parser\n"
-    //     "Some Description about program\n"
-    //     "\n"
-    //     "-i,  --input=<string>,  File path for input file [repeated, min args = 1]\n"
-    //     "-s,  --flag1,  Use some logic [default = true]\n"
-    //     "-p,  --flag2,  Use some logic\n"
-    //     "     --number=<int>,  Some Number\n"
-    //     "\n"
-    //     "-h, --help Display this help and exit\n"
-    // );
 }

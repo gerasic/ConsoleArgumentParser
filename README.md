@@ -1,5 +1,5 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-718a45dd9cf7e7f842a935f5ebbe5719a5e09af4491e668f4dbf3b35d5cca122.svg)](https://classroom.github.com/online_ide?assignment_repo_id=12807763&assignment_repo_type=AssignmentRepo)
-# Лабораторная работа 4
+# Console Argument Parser
 
 ## Задача
 
@@ -32,8 +32,8 @@ TEST(ArgParserTestSuite, StringTest) {
 
 Проверяет, что
 
- - Вызов `parser.Parse(SplitString("app --param1=value1"))` вернет `true`
- - Вызов `parser.GetStringValue("param1")` вернет `"value1"`
+- Вызов `parser.Parse(SplitString("app --param1=value1"))` вернет `true`
+- Вызов `parser.GetStringValue("param1")` вернет `"value1"`
 
 ## Реализация
 
@@ -52,9 +52,3 @@ TEST(ArgParserTestSuite, StringTest) {
 1. Выполнение работы подразумевает только базовые знания о классах. Не запрещается использовать шаблоны, виртуальные функции и т.д. Однако для этого надо хорошо понимать как они работают и быть готовыми к вопросам.
 
 2. Данная лабораторная работа может быть переиспользована в следующих, в качестве библиотеки для работы с аргументами командной строки.
-
-## Deadline
-
-1. 21.11.23 24:00 - 0.8
-2. 28.11.23 24:00 - 0.65
-3. 05.12.23 24:00 - 0.5
