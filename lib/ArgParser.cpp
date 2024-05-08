@@ -3,28 +3,40 @@
 
 using namespace ArgumentParser;
 
-ArgParser::ArgParser(const std::string& name) : name_(name) {}
-ArgParser::ArgParser(std::string&& name) : name_(std::move(name)) {}
+ArgParser::ArgParser(const std::string& name) 
+    : name_(name) 
+{}
+
+ArgParser::ArgParser(std::string&& name) 
+    : name_(std::move(name)) 
+{}
 
 
 //====================================================STRING============================================================
 StringType& ArgParser::AddStringArgument(std::string&& long_name) {
     return AddStringArgument(' ', std::move(long_name), "");
 }
+
 StringType& ArgParser::AddStringArgument(char short_name, std::string&& long_name) {
     return AddStringArgument(short_name, std::move(long_name), "");
 }
+
 StringType& ArgParser::AddStringArgument(std::string&& long_name, std::string&& description) {
     return AddStringArgument(' ', std::move(long_name), std::move(description));
 }
+
 StringType& ArgParser::AddStringArgument(char short_name, std::string&& long_name, std::string&& description) {
     std::shared_ptr<StringType> new_arg = std::make_shared<StringType>(short_name, std::move(long_name), std::move(description));
 
     const std::string& long_name_ = new_arg->GetLongName();
 
-    if (!long_name_.empty()) long_name_keys_[long_name_] = new_arg;
-    if (short_name != ' ') short_name_keys_[short_name] = new_arg;
-
+    if (!long_name_.empty()) {
+        long_name_keys_[long_name_] = new_arg;
+    }
+    if (short_name != ' ') {
+        short_name_keys_[short_name] = new_arg;
+    }
+    
     return *new_arg;
 }
 
@@ -35,6 +47,7 @@ std::string ArgParser::GetStringValue(const std::string& key) {
 
     return long_name_keys_[key]->GetStringValue();
 }
+
 std::string ArgParser::GetStringValue(const std::string& key, size_t at) {
     if (!long_name_keys_.contains(key)) {
         throw std::invalid_argument("No such argument.");
@@ -48,12 +61,15 @@ std::string ArgParser::GetStringValue(const std::string& key, size_t at) {
 IntType& ArgParser::AddIntArgument(std::string&& long_name) {
     return AddIntArgument(' ', std::move(long_name), "");
 }
+
 IntType& ArgParser::AddIntArgument(char short_name, std::string&& long_name) {
     return AddIntArgument(short_name, std::move(long_name), "");
 }
+
 IntType& ArgParser::AddIntArgument(std::string&& long_name, std::string&& description) {
     return AddIntArgument(' ', std::move(long_name), std::move(description));
 }
+
 IntType& ArgParser::AddIntArgument(char short_name, std::string&& long_name, std::string&& description) {
     std::shared_ptr<IntType> new_arg = std::make_shared<IntType>(short_name, std::move(long_name), std::move(description));
 
@@ -85,12 +101,15 @@ int ArgParser::GetIntValue(const std::string& key, size_t at) {
 FlagType& ArgParser::AddFlag(std::string&& long_name) {
     return AddFlag(' ', std::move(long_name), "");
 }
+
 FlagType& ArgParser::AddFlag(char short_name, std::string&& long_name) {
     return AddFlag(short_name, std::move(long_name), "");
 }
+
 FlagType& ArgParser::AddFlag(std::string&& long_name, std::string&& description) {
     return AddFlag(' ', std::move(long_name), std::move(description));
 }
+
 FlagType& ArgParser::AddFlag(char short_name, std::string&& long_name, std::string&& description) {
     std::shared_ptr<FlagType> new_arg = std::make_shared<FlagType>(short_name, std::move(long_name), std::move(description));
 
@@ -109,6 +128,7 @@ bool ArgParser::GetFlag(const std::string &key) {
 
     return long_name_keys_[key]->GetFlag();
 }
+
 bool ArgParser::GetFlag(const std::string &key, size_t at) {
     if (!long_name_keys_.contains(key)) {
         throw std::invalid_argument("No such argument.");
@@ -122,12 +142,15 @@ bool ArgParser::GetFlag(const std::string &key, size_t at) {
 FlagType& ArgParser::AddHelp(std::string&& long_name) {
     return AddFlag(' ', std::move(long_name), "");
 }
+
 FlagType& ArgParser::AddHelp(char short_name, std::string&& long_name) {
     return AddFlag(short_name, std::move(long_name), "");
 }
+
 FlagType& ArgParser::AddHelp(std::string&& long_name, std::string&& description) {
     return AddFlag(' ', std::move(long_name), std::move(description));
 }
+
 FlagType& ArgParser::AddHelp(char short_name, std::string&& long_name, std::string&& description) {
     std::shared_ptr<FlagType> new_arg = std::make_shared<FlagType>(short_name, std::move(long_name), std::move(description));
 
@@ -191,6 +214,7 @@ std::string ArgParser::GetType(const std::shared_ptr<BaseType>& ptr) {
 bool ArgParser::Parse(int argc, char** argv) {
     return Parse({argv, argv + argc});
 }
+
 bool ArgParser::Parse(const std::vector<std::string>& arguments) {
     std::string_view positional_key; // for only positional arguments
 
@@ -212,7 +236,6 @@ bool ArgParser::Parse(const std::vector<std::string>& arguments) {
             while (++i < arguments.size()) {
                 std::string_view next_argument = arguments[i];
                 if (next_argument.starts_with("-") || next_argument.starts_with("--")) {
-                    --i;
                     break;
                 }
 
@@ -326,6 +349,7 @@ bool ArgParser::IsMulti(const std::string_view& argument) {
 
     return false;
 }
+
 bool ArgParser::IsPositional(const std::string_view& arg_key) {
     if (short_name_keys_.contains(arg_key[0])
         && short_name_keys_.find(arg_key[0])->second->IsPositional()) {
@@ -337,6 +361,7 @@ bool ArgParser::IsPositional(const std::string_view& arg_key) {
     }
     return false;
 }
+
 bool ArgParser::IsFlag(const std::string_view& argument) {
     if (argument.starts_with("--")) {
         std::string_view key = argument.substr(2);
@@ -355,6 +380,7 @@ bool ArgParser::IsFlag(const std::string_view& argument) {
 
     return true;
 }
+
 bool ArgParser::IsHelp(const std::string_view& argument) {
     if (argument.starts_with("--")) {
         std::string_view key = argument.substr(2);
